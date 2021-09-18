@@ -1,0 +1,49 @@
+#load the deviations of CST
+data = np.loadtxt('Difference-AA.txt')
+age1 = data[:,0]
+Difference1 = data[:,1]
+data = np.loadtxt('Difference-BB.txt')
+age2 = data[:,0]
+Difference2 = data[:,1]
+
+N = len(age1)
+M = len(age2)
+print(N,M)
+
+T = N + M
+
+DataT = np.zeros((T,2))
+for i in range(N):
+    DataT[i,0] = age1[i]
+    DataT[i,1] = Difference1[i]
+for j in range(M):
+    DataT[j+N,0] = age2[j]
+    DataT[j+N,1] = Difference2[j]
+
+# statsmodels.api
+import statsmodels.api as sm 
+lowess=sm.nonparametric.lowess
+#z=lowess(DataT[:, 1], DataT[:, 0], frac=0.2 )
+z1=lowess(Difference1[:], age1[:], frac=0.25 )
+z2=lowess(Difference2[:], age2[:], frac=0.4 )
+
+
+
+########################################
+
+#draw the lowess smmoth line
+fig = plt.figure(figsize=(10,3), dpi=500)  
+ax1 = fig.add_subplot(111) 
+
+ax1.plot(DataT[:, 0], DataT[:, 1], linestyle=":", color='b')
+ax1.plot(z1[:,0],z1[:,1],color='r', lw=1)
+ax1.plot(z2[:,0],z2[:,1],color='r', lw=1)
+ax1.scatter(age1, Difference1, color='b')
+ax1.scatter(age2, Difference2, color='b')
+plt.xlim(0,24)
+plt.gca().invert_xaxis()
+plt.ylabel('km',fontsize=20)
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
+ 
+plt.savefig("lowess",dpi=800)
