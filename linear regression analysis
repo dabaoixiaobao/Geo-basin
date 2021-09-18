@@ -1,0 +1,81 @@
+%matplotlib inline
+
+#import gflex
+import math
+import numpy as np
+from matplotlib import pyplot as plt
+import pandas as pd
+from scipy.interpolate import interp1d
+from scipy.optimize import leastsq
+
+from pandas import Series, DataFrame
+import matplotlib.pyplot as plt
+
+fig = plt.figure(figsize=(10,6), dpi=500)  
+ax1 = fig.add_subplot(111)
+
+#load the positions and errors of CSTs
+data = np.loadtxt('AA.txt')
+age1 = data[:,0]
+Distance1 = data[:,1]
+data1 = np.loadtxt('AAerror.txt')
+Xerror = data1[:,0]
+Yerror = data1[:,1]
+
+x1=np.linspace(5.5, 23.5, 100)
+
+#calculate the deviaitons 
+def f1(p1):
+    k1, b1 = p1
+    return(Distance1-(k1*age1+b1))
+#find the best fitted line
+r1 = leastsq(f1, [1,0])
+k1, b1 = r1[0]
+print("k1=",k1,"b1=",b1)
+
+y1=k1*x1+b1
+
+#Draw the plot
+ax = plt.gca()  
+#ax1.scatter(age1, Distance1, color='b', marker='o', s=10)
+ax1.plot(y1, x1, color='b',linewidth=5, linestyle=":",markersize=20)
+ax1.plot(Distance1, age1,color='k')
+plt.gca().invert_yaxis()
+plt.axhline(23.6, linestyle=":",color='k')
+plt.axhline(20.1, linestyle=":",color='k')
+plt.axhline(16, linestyle=":",color='k')
+plt.axhline(4.7, linestyle=":",color='k')
+#plt.axhline(2.1, linestyle=":",color='k')
+plt.ylabel('Age (Ma)',fontsize=20)
+plt.xlabel('Distance (km)',fontsize=20)
+#plt.ylim(0,12)
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
+plt.errorbar(Distance1,age1,
+             yerr = Xerror,
+             ecolor='k',
+             xerr = Yerror,
+             )
+#plt.grid(axis='both')
+plt.savefig("AA01.png",dpi=800)
+
+#calculate the R value
+def computeCorrelation(X, Y):
+    xBar = np.mean(X)
+    yBar = np.mean(Y)
+    SSR = 0
+    varX = 0
+    varY = 0
+    for i in range(0 , len(X)):
+        diffXXBar = X[i] - xBar
+        diffYYBar = Y[i] - yBar
+        SSR += (diffXXBar * diffYYBar)
+        varX +=  diffXXBar**2
+        varY += diffYYBar**2
+    
+    SST = math.sqrt(varX * varY)
+    print ("使用math库：r：", SSR / SST,"r-squared：", (SSR / SST)**2)
+    return 
+ 
+computeCorrelation(Distance1, age1)
+ 
