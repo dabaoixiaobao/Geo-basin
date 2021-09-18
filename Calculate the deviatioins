@@ -1,0 +1,32 @@
+Distance2 = k1 * age1 + b1
+Difference = Distance1 - Distance2
+
+filename = 'Difference.txt'
+N = len(age1)
+data = np.zeros((N,2))
+for i in range(N):
+    data[i,0] = age1[i]
+    data[i,1] = Difference[i]
+#with open(filename, 'w') as file_object:
+#    file_object.write(data)
+np.savetxt('Difference-AA.txt', data, fmt="%.2f", delimiter=' ')
+print(data)
+
+#draw the deviation plot
+fig = plt.figure(figsize=(10,6), dpi=500)  
+plt.scatter(age1, Difference, color='k')
+plt.plot(age1, Difference, color='b',linewidth=2, markersize=20)
+#plt.xlim(xmin=0, xmax=3.3)
+plt.gca().invert_xaxis()
+plt.axvline(23.6, linestyle=":",color='k')
+plt.axvline(20.1, linestyle=":",color='k')
+plt.axvline(16, linestyle=":",color='k')
+plt.axvline(4.7, linestyle=":",color='k')
+#plt.axvline(2.1, linestyle=":",color='k')
+plt.xlabel('Age (Ma)',fontsize=20)
+plt.ylabel('Difference (km)',fontsize=20)
+
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
+
+plt.savefig("AA-deviation.png",dpi=600)
